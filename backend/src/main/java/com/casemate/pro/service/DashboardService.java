@@ -49,6 +49,8 @@ public class DashboardService {
 
     public LawyerDashboardResponse getLawyerFullDashboard(User lawyer) {
         Long activeCases = caseRepository.countActiveCasesByLawyer(lawyer);
+        Long pendingCases = caseRepository.countPendingCasesByLawyer(lawyer);
+        Long closedCases = caseRepository.countClosedCasesByLawyer(lawyer);
         Long totalClients = userRepository.countClients();
         Double monthlyRevenue = calculateMonthlyRevenue(lawyer);
         Long pendingTasks = calculatePendingTasks(lawyer);
@@ -59,11 +61,13 @@ public class DashboardService {
             .map(this::convertToCaseResponse)
             .collect(Collectors.toList());
 
-        return new LawyerDashboardResponse(activeCases, totalClients, monthlyRevenue, pendingTasks, caseResponses);
+        return new LawyerDashboardResponse(activeCases, pendingCases, closedCases, totalClients, monthlyRevenue, pendingTasks, caseResponses);
     }
 
     public ClientDashboardResponse getClientFullDashboard(User client) {
-        Long activeCases = caseRepository.countCasesByClient(client);
+        Long activeCases = caseRepository.countActiveCasesByClient(client);
+        Long pendingCases = caseRepository.countPendingCasesByClient(client);
+        Long closedCases = caseRepository.countClosedCasesByClient(client);
         Long totalDocuments = documentRepository.countDocumentsByClient(client);
         Long upcomingAppointments = countUpcomingAppointments(client);
         Long unreadMessages = 0L; // Placeholder - implement when message system is ready
@@ -74,7 +78,7 @@ public class DashboardService {
             .map(this::convertToCaseResponse)
             .collect(Collectors.toList());
 
-        return new ClientDashboardResponse(activeCases, totalDocuments, upcomingAppointments, unreadMessages, caseResponses);
+        return new ClientDashboardResponse(activeCases, pendingCases, closedCases, totalDocuments, upcomingAppointments, unreadMessages, caseResponses);
     }
 
     private CaseResponse convertToCaseResponse(Case caseEntity) {

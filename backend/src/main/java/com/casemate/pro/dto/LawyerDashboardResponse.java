@@ -11,6 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class LawyerDashboardResponse {
     private Long activeCases;
+    private Long pendingCases;
+    private Long closedCases;
     private Long totalClients;
     private Double monthlyRevenue;
     private Long pendingTasks;

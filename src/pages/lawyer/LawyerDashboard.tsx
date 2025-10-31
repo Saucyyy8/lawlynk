@@ -160,7 +160,12 @@ const LawyerDashboard = () => {
         {/* Analytics Section */}
         <div>
           <h2 className="text-2xl font-semibold mb-4">Case Analytics</h2>
-          <CaseAnalytics type="lawyer" />
+          <CaseAnalytics 
+            type="lawyer" 
+            activeCases={dashboardData?.activeCases ?? 0}
+            pendingCases={dashboardData?.pendingCases ?? 0}
+            closedCases={dashboardData?.closedCases ?? 0}
+          />
         </div>
 
         {/* Main Content Grid */}

@@ -151,7 +151,12 @@ const ClientDashboard = () => {
         {/* Analytics Section */}
         <div>
           <h2 className="text-2xl font-semibold mb-4">Case Overview</h2>
-          <CaseAnalytics type="client" />
+          <CaseAnalytics 
+            type="client" 
+            activeCases={dashboardData?.activeCases ?? 0}
+            pendingCases={dashboardData?.pendingCases ?? 0}
+            closedCases={dashboardData?.closedCases ?? 0}
+          />
         </div>
 
         {/* Main Content Grid */}

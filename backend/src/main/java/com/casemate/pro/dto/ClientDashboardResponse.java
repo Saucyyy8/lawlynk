@@ -11,6 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ClientDashboardResponse {
     private Long activeCases;
+    private Long pendingCases;
+    private Long closedCases;
     private Long totalDocuments;
     private Long upcomingAppointments;
     private Long unreadMessages;

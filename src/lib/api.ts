@@ -41,6 +41,8 @@ export interface CaseData {
 
 export interface LawyerDashboardData {
   activeCases: number;
+  pendingCases: number;
+  closedCases: number;
   totalClients: number;
   monthlyRevenue: number;
   pendingTasks: number;
@@ -49,6 +51,8 @@ export interface LawyerDashboardData {
 
 export interface ClientDashboardData {
   activeCases: number;
+  pendingCases: number;
+  closedCases: number;
   totalDocuments: number;
   upcomingAppointments: number;
   unreadMessages: number;

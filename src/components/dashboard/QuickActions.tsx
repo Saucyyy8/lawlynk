@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Calendar, Users, Upload, MessageSquare } from "lucide-react";
+import { Plus, FileText, Calendar, Users, Upload, MessageSquare, FolderOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface QuickActionsProps {
@@ -12,32 +12,32 @@ export function QuickActions({ userRole }: QuickActionsProps) {
 
   const lawyerActions = [
     {
-      icon: Plus,
-      label: "New Case",
-      description: "Create a new case",
+      icon: FolderOpen,
+      label: "View Cases",
+      description: "See all your cases",
       gradient: "from-blue-500 to-cyan-500",
-      onClick: () => navigate("/lawyer/cases/new"),
+      onClick: () => navigate("/lawyer/cases"),
     },
     {
       icon: Users,
-      label: "Add Client",
-      description: "Register new client",
+      label: "View Clients",
+      description: "Manage your clients",
       gradient: "from-purple-500 to-pink-500",
-      onClick: () => console.log("Add client"),
-    },
-    {
-      icon: Calendar,
-      label: "Schedule Hearing",
-      description: "Set court date",
-      gradient: "from-amber-500 to-orange-500",
-      onClick: () => console.log("Schedule hearing"),
+      onClick: () => navigate("/lawyer/clients"),
     },
     {
       icon: FileText,
-      label: "Generate Report",
-      description: "Case summary report",
+      label: "Documents",
+      description: "Access documents",
+      gradient: "from-amber-500 to-orange-500",
+      onClick: () => navigate("/lawyer/documents"),
+    },
+    {
+      icon: Calendar,
+      label: "Settings",
+      description: "Account settings",
       gradient: "from-green-500 to-emerald-500",
-      onClick: () => console.log("Generate report"),
+      onClick: () => navigate("/lawyer/settings"),
     },
   ];
 
@@ -47,28 +47,28 @@ export function QuickActions({ userRole }: QuickActionsProps) {
       label: "New Case Request",
       description: "Submit a new case",
       gradient: "from-blue-500 to-cyan-500",
-      onClick: () => navigate("/client/cases/new"),
+      onClick: () => navigate("/client/create-case"),
     },
     {
-      icon: Upload,
-      label: "Upload Document",
-      description: "Share case documents",
+      icon: FolderOpen,
+      label: "My Cases",
+      description: "View your cases",
       gradient: "from-purple-500 to-pink-500",
-      onClick: () => console.log("Upload document"),
+      onClick: () => navigate("/client/cases"),
     },
     {
-      icon: MessageSquare,
-      label: "Contact Lawyer",
-      description: "Send a message",
+      icon: FileText,
+      label: "Documents",
+      description: "Access documents",
       gradient: "from-amber-500 to-orange-500",
-      onClick: () => console.log("Contact lawyer"),
+      onClick: () => navigate("/client/documents"),
     },
     {
       icon: Calendar,
-      label: "View Schedule",
-      description: "Check appointments",
+      label: "Settings",
+      description: "Account settings",
       gradient: "from-green-500 to-emerald-500",
-      onClick: () => console.log("View schedule"),
+      onClick: () => navigate("/client/settings"),
     },
   ];
 

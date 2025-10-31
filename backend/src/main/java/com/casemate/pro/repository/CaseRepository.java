@@ -38,6 +38,21 @@ public interface CaseRepository extends JpaRepository<Case, UUID> {
     @Query("SELECT COUNT(c) FROM Case c WHERE c.client = :client")
     Long countCasesByClient(@Param("client") User client);
     
+    @Query("SELECT COUNT(c) FROM Case c WHERE c.lawyer = :lawyer AND c.status = 'PENDING'")
+    Long countPendingCasesByLawyer(@Param("lawyer") User lawyer);
+    
+    @Query("SELECT COUNT(c) FROM Case c WHERE c.lawyer = :lawyer AND c.status = 'CLOSED'")
+    Long countClosedCasesByLawyer(@Param("lawyer") User lawyer);
+    
+    @Query("SELECT COUNT(c) FROM Case c WHERE c.client = :client AND c.status = 'ACTIVE'")
+    Long countActiveCasesByClient(@Param("client") User client);
+    
+    @Query("SELECT COUNT(c) FROM Case c WHERE c.client = :client AND c.status = 'PENDING'")
+    Long countPendingCasesByClient(@Param("client") User client);
+    
+    @Query("SELECT COUNT(c) FROM Case c WHERE c.client = :client AND c.status = 'CLOSED'")
+    Long countClosedCasesByClient(@Param("client") User client);
+    
     @Query("SELECT c FROM Case c WHERE c.lawyer = :lawyer ORDER BY c.updatedAt DESC")
     List<Case> findRecentCasesByLawyer(@Param("lawyer") User lawyer, Pageable pageable);
     
