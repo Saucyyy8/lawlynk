@@ -15,15 +15,12 @@ interface Lawyer {
   name: string;
 }
 
-const documentCategories = ["PAN_CARD", "AADHAR_CARD", "DRIVING_LICENSE", "OTHER"];
-
 const CreateCase = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [lawyers, setLawyers] = useState<Lawyer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLawyer, setSelectedLawyer] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLawyers = async () => {
@@ -55,7 +52,6 @@ const CreateCase = () => {
     const title = formData.get("case-title") as string;
     const description = formData.get("case-description") as string;
     const nextHearing = formData.get("next-hearing") as string;
-    const documents = formData.getAll("case-documents") as File[];
 
     if (!selectedLawyer) {
       toast({ title: "Error", description: "Please select a lawyer.", variant: "destructive" });
@@ -63,14 +59,7 @@ const CreateCase = () => {
       return;
     }
 
-    if (documents.length > 0 && !selectedCategory) {
-      toast({ title: "Error", description: "Please select a document category.", variant: "destructive" });
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      // Step 1: Create the case
       const caseResponse = await fetch(`${api.baseURL}/api/cases`, {
         method: "POST",
         headers: {
@@ -82,31 +71,6 @@ const CreateCase = () => {
 
       if (!caseResponse.ok) {
         throw new Error("Failed to create case");
-      }
-
-      const newCase = await caseResponse.json();
-
-      // Step 2: Upload documents if they exist
-      if (documents.length > 0) {
-        const docFormData = new FormData();
-        docFormData.append("caseId", newCase.id);
-        docFormData.append("description", "Initial case documents");
-        docFormData.append("category", selectedCategory!);
-        documents.forEach(file => {
-          docFormData.append("files", file);
-        });
-
-        const docResponse = await fetch(`${api.baseURL}/api/documents/multiple`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: docFormData,
-        });
-
-        if (!docResponse.ok) {
-          throw new Error("Failed to upload documents");
-        }
       }
 
       toast({ title: "Success", description: "Case created successfully!" });
@@ -141,27 +105,6 @@ const CreateCase = () => {
               <div className="space-y-2">
                 <Label htmlFor="next-hearing">Next Hearing Date (Optional)</Label>
                 <Input id="next-hearing" name="next-hearing" type="datetime-local" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="case-documents">Upload Documents</Label>
-                  <Input id="case-documents" name="case-documents" type="file" multiple />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="document-category">Document Category</Label>
-                  <Select onValueChange={setSelectedCategory}>
-                    <SelectTrigger id="document-category">
-                      <SelectValue placeholder="Select category..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {documentCategories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category.replace("_", " ")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lawyer-select">Select a Lawyer</Label>

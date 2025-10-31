@@ -35,9 +35,13 @@ const LawyerCaseDetailPage = () => {
     }
   }, [id, toast]);
 
+  const handleCaseUpdate = (updatedCase: Case) => {
+    setCaseData(updatedCase);
+  };
+
   return (
     <DashboardLayout userRole="lawyer">
-      {caseData ? <CaseDetail caseData={caseData} /> : <p>Loading...</p>}
+      {caseData ? <CaseDetail caseData={caseData} onCaseUpdate={handleCaseUpdate} /> : <p>Loading...</p>}
     </DashboardLayout>
   );
 };

@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/stats")
+@RequestMapping("/api/stats")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class DashboardController {

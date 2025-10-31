@@ -28,7 +28,7 @@ public class DashboardService {
     public DashboardStatsResponse getClientDashboardStats(User client) {
         Long activeCases = caseRepository.countCasesByClient(client);
         Long totalDocuments = documentRepository.countDocumentsByClient(client);
-        
+
         // For clients, we'll use different metrics
         return new DashboardStatsResponse(
             activeCases,

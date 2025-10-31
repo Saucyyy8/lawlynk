@@ -1,39 +1,68 @@
+import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layouts/DashboardLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { CaseCard } from "@/components/CaseCard";
 import { FolderOpen, Users, DollarSign, Clock } from "lucide-react";
+import { api } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import { Case } from "@/types/case";
 
 const LawyerDashboard = () => {
-  // TODO: Fetch from Spring Boot backend: GET /api/stats/dashboard
-  // Expected response: { activeCases, totalClients, monthlyRevenue, pendingTasks }
-  
-  const stats = {
-    activeCases: 24,
-    totalClients: 156,
-    monthlyRevenue: "$45,230",
-    pendingTasks: 8,
-  };
+  const { toast } = useToast();
+  const [recentCases, setRecentCases] = useState<Case[]>([]);
+  const [stats, setStats] = useState({
+    activeCases: 0,
+    totalClients: 0,
+    monthlyRevenue: "$0",
+    pendingTasks: 0,
+  });
 
-  // TODO: Fetch recent cases: GET /api/cases?limit=4&sort=recent
-  const recentCases = [
-    {
-      id: "1",
-      caseNumber: "CS-2025-001",
-      title: "Smith v. Johnson Corp",
-      client: "Sarah Smith",
-      status: "active" as const,
-      lastUpdated: "2 hours ago",
-      nextHearing: "Jan 15, 2025",
-    },
-    {
-      id: "2",
-      caseNumber: "CS-2025-002",
-      title: "Estate Planning - Williams",
-      client: "Robert Williams",
-      status: "pending" as const,
-      lastUpdated: "1 day ago",
-    },
-  ];
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      // Fetch stats
+      try {
+        const statsResponse = await fetch(`${api.baseURL}/api/stats/dashboard`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (statsResponse.ok) {
+          const data = await statsResponse.json();
+          setStats({
+            activeCases: data.activeCases,
+            totalClients: data.totalClients,
+            monthlyRevenue: `$${data.monthlyRevenue}`,
+            pendingTasks: data.pendingTasks,
+          });
+        } else {
+          toast({ title: "Error", description: "Could not fetch dashboard stats.", variant: "destructive" });
+        }
+      } catch (error) {
+        console.error(error);
+        toast({ title: "Error", description: "Could not connect to the server for stats.", variant: "destructive" });
+      }
+
+      // Fetch recent cases
+      try {
+        const casesResponse = await fetch(`${api.baseURL}/api/cases?limit=4&sort=recent`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (casesResponse.ok) {
+          const data = await casesResponse.json();
+          setRecentCases(data);
+        } else {
+          toast({ title: "Error", description: "Could not fetch recent cases.", variant: "destructive" });
+        }
+      } catch (error) {
+        console.error(error);
+        toast({ title: "Error", description: "Could not connect to the server for cases.", variant: "destructive" });
+      }
+    };
+
+    fetchDashboardData();
+  }, [toast]);
 
   return (
     <DashboardLayout userRole="lawyer">
@@ -75,9 +104,13 @@ const LawyerDashboard = () => {
         <div>
           <h2 className="mb-4 text-2xl font-semibold">Recent Cases</h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {recentCases.map((caseItem) => (
-              <CaseCard key={caseItem.id} {...caseItem} />
-            ))}
+            {recentCases.length > 0 ? (
+              recentCases.map((caseItem) => (
+                <CaseCard key={caseItem.id} {...caseItem} />
+              ))
+            ) : (
+              <p>No recent cases found.</p>
+            )}
           </div>
         </div>
       </div>

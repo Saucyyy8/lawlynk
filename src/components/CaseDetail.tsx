@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Document {
   id: string;
@@ -15,8 +16,14 @@ interface Document {
   uploadedAt: string;
 }
 
+interface Lawyer {
+  id: string;
+  name: string;
+}
+
 interface CaseDetailProps {
   caseData: Case;
+  onCaseUpdate?: (updatedCase: Case) => void; // Callback for when the case is updated
 }
 
 const statusColors = {
@@ -25,9 +32,11 @@ const statusColors = {
   CLOSED: "bg-muted text-muted-foreground",
 };
 
-export const CaseDetail = ({ caseData }: CaseDetailProps) => {
+export const CaseDetail = ({ caseData, onCaseUpdate }: CaseDetailProps) => {
   const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [lawyers, setLawyers] = useState<Lawyer[]>([]);
+  const [selectedLawyer, setSelectedLawyer] = useState<string | null>(caseData.lawyer?.id || null);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -52,6 +61,32 @@ export const CaseDetail = ({ caseData }: CaseDetailProps) => {
     fetchDocuments();
   }, [caseData.id, toast]);
 
+  useEffect(() => {
+    const fetchLawyers = async () => {
+      try {
+        const response = await fetch(`${api.baseURL}/api/lawyers`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setLawyers(data);
+        } else {
+          toast({ title: "Error", description: "Could not fetch lawyers.", variant: "destructive" });
+        }
+      } catch (error) {
+        console.error(error);
+        toast({ title: "Error", description: "Could not connect to the server.", variant: "destructive" });
+      }
+    };
+    fetchLawyers();
+  }, [toast]);
+
+  useEffect(() => {
+    setSelectedLawyer(caseData.lawyer?.id || null);
+  }, [caseData.lawyer?.id]);
+
   const handleDownload = async (doc: Document) => {
     try {
       const response = await fetch(`${api.baseURL}/api/documents/${doc.id}/download`, {
@@ -70,6 +105,58 @@ export const CaseDetail = ({ caseData }: CaseDetailProps) => {
         a.remove();
       } else {
         toast({ title: "Error", description: "Could not download document.", variant: "destructive" });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Error", description: "Could not connect to the server.", variant: "destructive" });
+    }
+  };
+
+  const handleLawyerChange = async (lawyerId: string) => {
+    setSelectedLawyer(lawyerId);
+    try {
+      const response = await fetch(`${api.baseURL}/api/cases/${caseData.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ lawyer: { id: lawyerId } }),
+      });
+
+      if (response.ok) {
+        const updatedCase = await response.json();
+        toast({ title: "Success", description: "Lawyer assigned successfully." });
+        if (onCaseUpdate) {
+          onCaseUpdate(updatedCase);
+        }
+      } else {
+        toast({ title: "Error", description: "Failed to assign lawyer.", variant: "destructive" });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Error", description: "Could not connect to the server.", variant: "destructive" });
+    }
+  };
+
+  const handleCaseAction = async (action: 'accept' | 'reject') => {
+    try {
+      const response = await fetch(`${api.baseURL}/api/cases/${caseData.id}/${action}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (response.ok) {
+        const updatedCase = await response.json();
+        toast({ title: "Success", description: `Case ${action}ed successfully.` });
+        if (onCaseUpdate) {
+          onCaseUpdate(updatedCase);
+        }
+      } else {
+        const errorData = await response.json();
+        toast({ title: "Error", description: errorData.error || `Failed to ${action} case.`, variant: "destructive" });
       }
     } catch (error) {
       console.error(error);
@@ -97,7 +184,18 @@ export const CaseDetail = ({ caseData }: CaseDetailProps) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h3 className="font-semibold">Assigned Lawyer</h3>
-              <p className="text-muted-foreground">{caseData.lawyer?.name || "Not Assigned"}</p>
+              <Select onValueChange={handleLawyerChange} value={selectedLawyer || ""}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Choose a lawyer..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {lawyers.map((lawyer) => (
+                    <SelectItem key={lawyer.id} value={lawyer.id}>
+                      {lawyer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <h3 className="font-semibold">Client</h3>
@@ -110,6 +208,18 @@ export const CaseDetail = ({ caseData }: CaseDetailProps) => {
               {caseData.nextHearing ? new Date(caseData.nextHearing).toLocaleString() : "Not set"}
             </p>
           </div>
+
+          {/* Accept/Reject Buttons for PENDING cases */}
+          {caseData.status === 'PENDING' && (
+            <div className="flex gap-2 mt-4">
+              <Button onClick={() => handleCaseAction('accept')} variant="success">
+                Accept Case
+              </Button>
+              <Button onClick={() => handleCaseAction('reject')} variant="destructive">
+                Reject Case
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 

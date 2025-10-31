@@ -70,8 +70,8 @@ public class SecurityConfig {
         configuration.addAllowedOriginPattern("*"); // Allow all origins in development
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
-        
-        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = 
+
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source =
             new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

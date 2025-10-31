@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             details.add(error.getField() + ": " + error.getDefaultMessage());
         }
-        
+
         ErrorResponse errorResponse = new ErrorResponse(
             "Bad Request",
             "Validation failed",
