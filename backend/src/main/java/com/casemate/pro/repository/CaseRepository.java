@@ -58,6 +58,8 @@ public interface CaseRepository extends JpaRepository<Case, UUID> {
     
     @Query("SELECT c FROM Case c WHERE c.client = :client ORDER BY c.updatedAt DESC")
     List<Case> findRecentCasesByClient(@Param("client") User client, Pageable pageable);
+
+    List<Case> findByClientId(UUID clientId);
     
     boolean existsByCaseNumber(String caseNumber);
 }

@@ -72,7 +72,7 @@ public class Case {
     @PrePersist
     public void generateCaseNumber() {
         if (this.caseNumber == null) {
-            this.caseNumber = "CS-" + java.time.Year.now() + "-" + 
+            this.caseNumber = "CS-" + java.time.Year.now() + "-" +
                 String.format("%03d", (int) (Math.random() * 1000));
         }
     }

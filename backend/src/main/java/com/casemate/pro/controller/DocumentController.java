@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/documents")
+@RequestMapping("/api/documents")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class DocumentController {
@@ -35,11 +35,11 @@ public class DocumentController {
         try {
             User currentUser = authService.getCurrentUser();
             Page<Document> documentPage = documentService.getDocuments(currentUser, caseId, page, size);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("documents", documentPage.getContent());
             response.put("total", documentPage.getTotalElements());
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -55,7 +55,7 @@ public class DocumentController {
         try {
             User currentUser = authService.getCurrentUser();
             Document document = documentService.uploadDocument(file, caseId, description, category, currentUser);
-            return ResponseEntity.status(201).body(document);
+            return ResponseEntity.ok(document);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -70,7 +70,18 @@ public class DocumentController {
         try {
             User currentUser = authService.getCurrentUser();
             List<Document> documents = documentService.uploadMultipleDocuments(files, caseId, description, category, currentUser);
-            return ResponseEntity.status(201).body(documents);
+            return ResponseEntity.ok(documents);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Document> getDocument(@PathVariable UUID id) {
+        try {
+            User currentUser = authService.getCurrentUser();
+            Document document = documentService.getDocumentById(id, currentUser);
+            return ResponseEntity.ok(document);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -82,9 +93,9 @@ public class DocumentController {
             User currentUser = authService.getCurrentUser();
             Document document = documentService.getDocumentById(id, currentUser);
             byte[] data = documentService.downloadDocument(id, currentUser);
-            
+
             ByteArrayResource resource = new ByteArrayResource(data);
-            
+
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -100,7 +111,7 @@ public class DocumentController {
         try {
             User currentUser = authService.getCurrentUser();
             documentService.deleteDocument(id, currentUser);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

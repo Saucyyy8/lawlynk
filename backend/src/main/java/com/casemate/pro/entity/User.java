@@ -40,6 +40,11 @@ public class User {
 
     private String address;
 
+    private Integer age;
+
+    @Column(columnDefinition = "TEXT")
+    private String aboutClient;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

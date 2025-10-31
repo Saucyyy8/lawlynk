@@ -13,6 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +55,9 @@ public class AuthService {
                 savedUser.getId(),
                 savedUser.getEmail(),
                 savedUser.getName(),
-                savedUser.getRole().name().toLowerCase()
+                savedUser.getRole().name().toLowerCase(),
+                savedUser.getAge(), // Added age
+                savedUser.getAboutClient() // Added aboutClient
             )
         );
     }
@@ -73,15 +78,38 @@ public class AuthService {
                 user.getId(),
                 user.getEmail(),
                 user.getName(),
-                user.getRole().name().toLowerCase()
+                user.getRole().name().toLowerCase(),
+                user.getAge(), // Added age
+                user.getAboutClient() // Added aboutClient
             )
         );
     }
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new RuntimeException("User not authenticated");
+        }
         String email = authentication.getName();
+        if (email == null) {
+            throw new RuntimeException("Authenticated user has no name (email)");
+        }
         return userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+
+    @Transactional
+    public User updateUserProfile(UUID userId, Integer age, String aboutClient) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        if (age != null) {
+            user.setAge(age);
+        }
+        if (aboutClient != null) {
+            user.setAboutClient(aboutClient);
+        }
+
+        return userRepository.save(user);
     }
 }
