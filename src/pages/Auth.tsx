@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Scale } from "lucide-react";
+import { InteractiveNebulaShader } from "@/components/ui/liquid-shader";
+import { Scale, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
@@ -105,60 +106,129 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-secondary/10 to-primary/5 p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary">
-            <Scale className="h-8 w-8 text-primary-foreground" />
+    <div className="relative min-h-screen">
+      {/* Nebula Background */}
+      <InteractiveNebulaShader disableCenterDimming={true} />
+      
+      {/* Back to Home Button */}
+      <Button
+        onClick={() => navigate("/")}
+        className="absolute top-6 left-6 z-20 bg-black/50 hover:bg-black/70 text-cyan-300 border border-cyan-500/30 backdrop-blur-md"
+        variant="ghost"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Home
+      </Button>
+
+      {/* Auth Content */}
+      <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-2xl backdrop-blur-xl bg-black/70 border-cyan-500/30">
+        <CardHeader className="text-center space-y-4">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/50">
+            <Scale className="h-9 w-9 text-white" />
           </div>
-          <CardTitle className="text-2xl">CaseMate Pro</CardTitle>
-          <CardDescription>Sign in to manage your cases</CardDescription>
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">LawLynk</CardTitle>
+          <CardDescription className="text-cyan-100/70 text-base">Sign in to manage your cases</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-black/50 border border-cyan-500/20">
+              <TabsTrigger 
+                value="login" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-cyan-500/50"
+              >
+                Login
+              </TabsTrigger>
+              <TabsTrigger 
+                value="signup"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-amber-500/50"
+              >
+                Sign Up
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
+            <TabsContent value="login" className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" placeholder="lawyer@example.com" required />
+                  <Label htmlFor="email" className="text-cyan-300 font-medium">Email</Label>
+                  <Input 
+                    id="email" 
+                    name="email" 
+                    type="email" 
+                    placeholder="lawyer@example.com" 
+                    required 
+                    className="bg-black/50 border-cyan-500/30 text-white placeholder:text-cyan-100/30 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" name="password" type="password" required />
+                  <Label htmlFor="password" className="text-cyan-300 font-medium">Password</Label>
+                  <Input 
+                    id="password" 
+                    name="password" 
+                    type="password" 
+                    required 
+                    className="bg-black/50 border-cyan-500/30 text-white focus:border-cyan-400 focus:ring-cyan-400/20"
+                  />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all" 
+                  disabled={isLoading}
+                >
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
             </TabsContent>
 
-            <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
+            <TabsContent value="signup" className="space-y-4">
+              <form onSubmit={handleSignup} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" name="name" placeholder="John Doe" required />
+                  <Label htmlFor="name" className="text-cyan-300 font-medium">Full Name</Label>
+                  <Input 
+                    id="name" 
+                    name="name" 
+                    placeholder="John Doe" 
+                    required 
+                    className="bg-black/50 border-cyan-500/30 text-white placeholder:text-cyan-100/30 focus:border-amber-400 focus:ring-amber-400/20"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input id="signup-email" name="signup-email" type="email" placeholder="lawyer@example.com" required />
+                  <Label htmlFor="signup-email" className="text-cyan-300 font-medium">Email</Label>
+                  <Input 
+                    id="signup-email" 
+                    name="signup-email" 
+                    type="email" 
+                    placeholder="lawyer@example.com" 
+                    required 
+                    className="bg-black/50 border-cyan-500/30 text-white placeholder:text-cyan-100/30 focus:border-amber-400 focus:ring-amber-400/20"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input id="signup-password" name="signup-password" type="password" required />
+                  <Label htmlFor="signup-password" className="text-cyan-300 font-medium">Password</Label>
+                  <Input 
+                    id="signup-password" 
+                    name="signup-password" 
+                    type="password" 
+                    required 
+                    className="bg-black/50 border-cyan-500/30 text-white focus:border-amber-400 focus:ring-amber-400/20"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="role">I am a</Label>
-                  <select id="role" name="role" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-                    <option value="LAWYER">Lawyer</option>
-                    <option value="CLIENT">Client</option>
+                  <Label htmlFor="role" className="text-cyan-300 font-medium">I am a</Label>
+                  <select 
+                    id="role" 
+                    name="role" 
+                    className="flex h-10 w-full rounded-md border border-cyan-500/30 bg-black/50 text-white px-3 py-2 text-sm focus:border-amber-400 focus:ring-amber-400/20 focus:outline-none"
+                  >
+                    <option value="LAWYER" className="bg-black">Lawyer</option>
+                    <option value="CLIENT" className="bg-black">Client</option>
                   </select>
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold shadow-lg shadow-amber-500/50 hover:shadow-amber-500/70 transition-all" 
+                  disabled={isLoading}
+                >
                   {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
               </form>
@@ -166,6 +236,7 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

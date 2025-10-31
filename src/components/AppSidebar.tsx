@@ -58,8 +58,7 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
           </div>
           {!isCollapsed && (
             <div>
-              <h2 className="text-lg font-semibold text-sidebar-foreground">CaseMate</h2>
-              <p className="text-xs text-sidebar-foreground/60">Pro</p>
+              <h2 className="text-lg font-semibold text-sidebar-foreground">LawLynk</h2>
             </div>
           )}
         </div>
