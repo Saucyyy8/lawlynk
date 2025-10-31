@@ -75,7 +75,9 @@ const ClientDashboard = () => {
 
         {/* My Cases */}
         <div>
-          <h2 className="mb-4 text-2xl font-semibold">My Cases</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">My Cases</h2>
+          </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {myCases.map((caseItem) => (
               <CaseCard key={caseItem.id} {...caseItem} />

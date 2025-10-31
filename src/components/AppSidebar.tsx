@@ -1,5 +1,5 @@
 import { Scale, LayoutDashboard, FolderOpen, FileText, Users, Settings, LogOut } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +13,7 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useToast } from "@/hooks/use-toast";
 
 interface AppSidebarProps {
   userRole: "lawyer" | "client";
@@ -21,7 +22,15 @@ interface AppSidebarProps {
 export function AppSidebar({ userRole }: AppSidebarProps) {
   const { state } = useSidebar();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const isCollapsed = state === "collapsed";
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast({ title: "Logged Out", description: "You have been successfully logged out." });
+    navigate("/");
+  };
 
   const lawyerItems = [
     { title: "Dashboard", url: "/lawyer/dashboard", icon: LayoutDashboard },
@@ -62,7 +71,7 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const isActive = location.pathname === item.url;
+                const isActive = location.pathname.startsWith(item.url);
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive}>
@@ -83,7 +92,7 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <button className="w-full" onClick={() => console.log("Logout")}>
+              <button className="w-full" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
               </button>

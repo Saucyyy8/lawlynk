@@ -1,9 +1,11 @@
 import { Calendar, User } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface CaseCardProps {
+  id: string;
   caseNumber: string;
   title: string;
   client: string;
@@ -18,7 +20,10 @@ const statusColors = {
   closed: "bg-muted text-muted-foreground",
 };
 
-export function CaseCard({ caseNumber, title, client, status, lastUpdated, nextHearing }: CaseCardProps) {
+export function CaseCard({ id, caseNumber, title, client, status, lastUpdated, nextHearing }: CaseCardProps) {
+  const location = useLocation();
+  const isLawyer = location.pathname.startsWith("/lawyer");
+
   return (
     <Card className="transition-all hover:shadow-md">
       <CardHeader className="pb-3">
@@ -45,8 +50,8 @@ export function CaseCard({ caseNumber, title, client, status, lastUpdated, nextH
               <span className="font-medium text-accent-foreground">Next Hearing:</span> {nextHearing}
             </div>
           )}
-          <Button className="w-full mt-2" variant="outline" size="sm">
-            View Details
+          <Button asChild className="w-full mt-2" variant="outline" size="sm">
+            <Link to={isLawyer ? `/lawyer/cases/${id}` : `/client/cases/${id}`}>View Details</Link>
           </Button>
         </div>
       </CardContent>

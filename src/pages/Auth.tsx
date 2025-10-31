@@ -7,47 +7,101 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Scale } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // TODO: Call your Spring Boot backend: POST /api/auth/login
-    // Expected payload: { email, password }
-    // Expected response: { token, user: { id, email, role, name } }
-    
-    setTimeout(() => {
-      toast({
-        title: "Login successful!",
-        description: "Redirecting to dashboard...",
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      const response = await fetch(`${api.baseURL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
-      // Mock redirect based on role
-      navigate("/lawyer/dashboard");
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast({
+          title: "Login successful!",
+          description: "Redirecting to your dashboard...",
+        });
+        navigate(data.user.role === "lawyer" ? "/lawyer/dashboard" : "/client/dashboard");
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Login Failed",
+          description: errorData.message || "Invalid email or password.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "An Error Occurred",
+        description: "Could not connect to the server. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // TODO: Call your Spring Boot backend: POST /api/auth/register
-    // Expected payload: { email, password, name, role }
-    // Expected response: { token, user: { id, email, role, name } }
-    
-    setTimeout(() => {
-      toast({
-        title: "Account created!",
-        description: "Welcome to CaseMate Pro",
+
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("signup-email") as string;
+    const password = formData.get("signup-password") as string;
+    const role = formData.get("role") as string;
+
+    try {
+      const response = await fetch(`${api.baseURL}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, role }),
       });
-      navigate("/lawyer/dashboard");
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast({
+          title: "Account Created!",
+          description: "Redirecting to your dashboard...",
+        });
+        navigate(role.toLowerCase() === "lawyer" ? "/lawyer/dashboard" : "/client/dashboard");
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Registration Failed",
+          description: errorData.message || "Please check your details and try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast({
+        title: "An Error Occurred",
+        description: "Could not connect to the server. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -71,11 +125,11 @@ const Auth = () => {
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="lawyer@example.com" required />
+                  <Input id="email" name="email" type="email" placeholder="lawyer@example.com" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" required />
+                  <Input id="password" name="password" type="password" required />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Signing in..." : "Sign In"}
@@ -87,21 +141,21 @@ const Auth = () => {
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" placeholder="John Doe" required />
+                  <Input id="name" name="name" placeholder="John Doe" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
-                  <Input id="signup-email" type="email" placeholder="lawyer@example.com" required />
+                  <Input id="signup-email" name="signup-email" type="email" placeholder="lawyer@example.com" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
-                  <Input id="signup-password" type="password" required />
+                  <Input id="signup-password" name="signup-password" type="password" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">I am a</Label>
-                  <select id="role" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-                    <option value="lawyer">Lawyer</option>
-                    <option value="client">Client</option>
+                  <select id="role" name="role" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                    <option value="LAWYER">Lawyer</option>
+                    <option value="CLIENT">Client</option>
                   </select>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
