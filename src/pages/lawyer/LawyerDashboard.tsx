@@ -4,7 +4,7 @@ import { CaseCard } from "@/components/CaseCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FolderOpen, Users, DollarSign, Clock, Loader2, TrendingUp, Sparkles } from "lucide-react";
-import { dashboardApi, LawyerDashboardData } from "@/lib/api";
+import { dashboardApi, LawyerDashboardData, activityApi, Activity } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { AdvancedStatsCard } from "@/components/dashboard/AdvancedStatsCard";
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
@@ -13,14 +13,19 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 
 const LawyerDashboard = () => {
   const [dashboardData, setDashboardData] = useState<LawyerDashboardData | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const data = await dashboardApi.getLawyerDashboard();
-        setDashboardData(data);
+        const [dashboardData, activitiesData] = await Promise.all([
+          dashboardApi.getLawyerDashboard(),
+          activityApi.getRecentActivities(),
+        ]);
+        setDashboardData(dashboardData);
+        setActivities(activitiesData);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         toast({
@@ -200,7 +205,7 @@ const LawyerDashboard = () => {
 
           {/* Activity Timeline - Takes 1 column */}
           <div className="lg:col-span-1">
-            <ActivityTimeline />
+            <ActivityTimeline activities={activities} />
           </div>
         </div>
       </div>

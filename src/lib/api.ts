@@ -86,6 +86,29 @@ export const dashboardApi = {
   },
 };
 
+// Activity API
+export interface Activity {
+  id: string;
+  type: "case_update" | "document" | "hearing" | "completed" | "alert";
+  title: string;
+  description: string;
+  time: string;
+  caseNumber?: string;
+}
+
+export const activityApi = {
+  getRecentActivities: async (): Promise<Activity[]> => {
+    const response = await fetch(`${baseURL}/api/stats/activities`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch activities');
+    }
+    return response.json();
+  },
+};
+
 export const api = {
   baseURL,
 };

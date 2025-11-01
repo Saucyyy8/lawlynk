@@ -67,4 +67,14 @@ public class DashboardController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/activities")
+    public ResponseEntity<?> getRecentActivities() {
+        try {
+            User currentUser = authService.getCurrentUser();
+            return ResponseEntity.ok(dashboardService.getRecentActivities(currentUser));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

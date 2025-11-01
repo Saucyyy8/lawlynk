@@ -4,7 +4,7 @@ import { CaseCard } from "@/components/CaseCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Calendar, MessageSquare, Loader2, FolderOpen, Sparkles, Shield } from "lucide-react";
-import { dashboardApi, ClientDashboardData } from "@/lib/api";
+import { dashboardApi, ClientDashboardData, activityApi, Activity } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { AdvancedStatsCard } from "@/components/dashboard/AdvancedStatsCard";
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
@@ -13,14 +13,19 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 
 const ClientDashboard = () => {
   const [dashboardData, setDashboardData] = useState<ClientDashboardData | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const data = await dashboardApi.getClientDashboard();
-        setDashboardData(data);
+        const [dashboardData, activitiesData] = await Promise.all([
+          dashboardApi.getClientDashboard(),
+          activityApi.getRecentActivities(),
+        ]);
+        setDashboardData(dashboardData);
+        setActivities(activitiesData);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         toast({
@@ -191,7 +196,7 @@ const ClientDashboard = () => {
 
           {/* Activity Timeline - Takes 1 column */}
           <div className="lg:col-span-1">
-            <ActivityTimeline />
+            <ActivityTimeline activities={activities} />
           </div>
         </div>
       </div>

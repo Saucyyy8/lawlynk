@@ -115,4 +115,77 @@ public class DashboardService {
             .filter(c -> c.getNextHearing() != null && c.getNextHearing().isAfter(LocalDateTime.now()))
             .count();
     }
+
+    public List<ActivityResponse> getRecentActivities(User user) {
+        // Get recent cases for the user
+        List<Case> recentCases;
+        if (user.getRole() == User.Role.LAWYER) {
+            recentCases = caseRepository.findRecentCasesByLawyer(user, PageRequest.of(0, 10));
+        } else {
+            recentCases = caseRepository.findRecentCasesByClient(user, PageRequest.of(0, 10));
+        }
+
+        // Convert to activity responses
+        return recentCases.stream()
+            .map(caseEntity -> {
+                ActivityResponse activity = new ActivityResponse();
+                activity.setId(caseEntity.getId().toString());
+                activity.setCaseNumber(caseEntity.getCaseNumber());
+                
+                // Determine activity type and details based on case status and updates
+                if (caseEntity.getNextHearing() != null && caseEntity.getNextHearing().isAfter(LocalDateTime.now())) {
+                    activity.setType("hearing");
+                    activity.setTitle("Upcoming Hearing");
+                    activity.setDescription("Court hearing scheduled");
+                    activity.setTime(formatActivityTime(caseEntity.getNextHearing()));
+                } else if (caseEntity.getStatus() == Case.Status.CLOSED) {
+                    activity.setType("completed");
+                    activity.setTitle("Case Closed");
+                    activity.setDescription(caseEntity.getTitle());
+                    activity.setTime(formatActivityTime(caseEntity.getUpdatedAt()));
+                } else if (caseEntity.getStatus() == Case.Status.ACTIVE) {
+                    activity.setType("case_update");
+                    activity.setTitle("Case Updated");
+                    activity.setDescription(caseEntity.getTitle());
+                    activity.setTime(formatActivityTime(caseEntity.getUpdatedAt()));
+                } else {
+                    activity.setType("case_update");
+                    activity.setTitle("New Case");
+                    activity.setDescription(caseEntity.getTitle());
+                    activity.setTime(formatActivityTime(caseEntity.getCreatedAt()));
+                }
+                
+                return activity;
+            })
+            .collect(Collectors.toList());
+    }
+
+    private String formatActivityTime(LocalDateTime dateTime) {
+        LocalDateTime now = LocalDateTime.now();
+        long hoursDiff = java.time.Duration.between(dateTime, now).toHours();
+        long daysDiff = java.time.Duration.between(dateTime, now).toDays();
+
+        if (hoursDiff < 1) {
+            return "Just now";
+        } else if (hoursDiff < 24) {
+            return hoursDiff + " hour" + (hoursDiff > 1 ? "s" : "") + " ago";
+        } else if (daysDiff == 1) {
+            return "Yesterday";
+        } else if (daysDiff < 7) {
+            return daysDiff + " days ago";
+        } else {
+            return dateTime.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+        }
+    }
+
+    // Inner class for Activity Response
+    @lombok.Data
+    public static class ActivityResponse {
+        private String id;
+        private String type;
+        private String title;
+        private String description;
+        private String time;
+        private String caseNumber;
+    }
 }
