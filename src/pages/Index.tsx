@@ -21,9 +21,14 @@ const Index = () => {
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">LawLynk</span>
         </div>
-        <Button onClick={() => navigate("/auth")} className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-lg shadow-amber-500/30">
-          Sign In
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button onClick={() => navigate("/auth?role=lawyer")} variant="outline" className="border-cyan-400/50 text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400">
+            Lawyer Login
+          </Button>
+          <Button onClick={() => navigate("/auth?role=client")} className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-lg shadow-amber-500/30">
+            Client Login
+          </Button>
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -38,10 +43,15 @@ const Index = () => {
           <p className="mt-8 text-xl text-cyan-100/80 leading-relaxed">
             Streamline your practice with intelligent case tracking, client communication, and document management all in one place.
           </p>
-          <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-10 py-6 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-0 shadow-2xl shadow-amber-500/50 font-bold">
-              Get Started Free
-            </Button>
+          <div className="mt-12 space-y-6">
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button size="lg" onClick={() => navigate("/auth?role=lawyer&tab=signup")} className="text-lg px-10 py-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-2xl shadow-cyan-500/50 font-bold">
+                Register as Lawyer
+              </Button>
+              <Button size="lg" onClick={() => navigate("/auth?role=client&tab=signup")} className="text-lg px-10 py-6 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-0 shadow-2xl shadow-amber-500/50 font-bold">
+                Register as Client
+              </Button>
+            </div>
             <Button size="lg" className="text-lg px-10 py-6 bg-transparent hover:bg-cyan-500/20 text-cyan-300 border-2 border-cyan-400/50 hover:border-cyan-400 backdrop-blur-sm shadow-lg shadow-cyan-500/20">
               Watch Demo
             </Button>
@@ -105,9 +115,14 @@ const Index = () => {
           <p className="mt-6 text-xl text-white/90 font-medium">
             Join hundreds of legal professionals already using LawLynk
           </p>
-          <Button size="lg" className="mt-10 text-lg px-12 py-6 bg-white hover:bg-cyan-50 text-amber-600 font-bold border-0 shadow-2xl hover:shadow-white/30 hover:scale-105 transition-all" onClick={() => navigate("/auth")}>
-            Start Your Free Trial
-          </Button>
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button size="lg" className="text-lg px-12 py-6 bg-white hover:bg-cyan-50 text-cyan-600 font-bold border-0 shadow-2xl hover:shadow-white/30 hover:scale-105 transition-all" onClick={() => navigate("/auth?role=lawyer&tab=signup")}>
+              Start as Lawyer
+            </Button>
+            <Button size="lg" className="text-lg px-12 py-6 bg-white hover:bg-cyan-50 text-orange-600 font-bold border-0 shadow-2xl hover:shadow-white/30 hover:scale-105 transition-all" onClick={() => navigate("/auth?role=client&tab=signup")}>
+              Start as Client
+            </Button>
+          </div>
           </div>
         </div>
       </section>

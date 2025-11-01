@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,14 +6,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InteractiveNebulaShader } from "@/components/ui/liquid-shader";
 import { Scale, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+  const [defaultTab, setDefaultTab] = useState("login");
+  const [defaultRole, setDefaultRole] = useState("LAWYER");
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    const role = searchParams.get("role");
+    
+    if (tab === "signup") {
+      setDefaultTab("signup");
+    }
+    if (role === "client") {
+      setDefaultRole("CLIENT");
+    } else if (role === "lawyer") {
+      setDefaultRole("LAWYER");
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -131,7 +148,7 @@ const Auth = () => {
           <CardDescription className="text-cyan-100/70 text-base">Sign in to manage your cases</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs value={defaultTab} onValueChange={setDefaultTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-black/50 border border-cyan-500/20">
               <TabsTrigger 
                 value="login" 
@@ -218,6 +235,7 @@ const Auth = () => {
                   <select 
                     id="role" 
                     name="role" 
+                    defaultValue={defaultRole}
                     className="flex h-10 w-full rounded-md border border-cyan-500/30 bg-black/50 text-white px-3 py-2 text-sm focus:border-amber-400 focus:ring-amber-400/20 focus:outline-none"
                   >
                     <option value="LAWYER" className="bg-black">Lawyer</option>

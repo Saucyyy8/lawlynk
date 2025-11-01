@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { api } from "@/lib/api";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardHeaderProps {
   userRole: "lawyer" | "client";
@@ -24,8 +25,10 @@ interface Notification {
 }
 
 export function DashboardHeader({ userRole }: DashboardHeaderProps) {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -59,19 +62,35 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
       .join("");
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Navigate to cases page with search query
+      const casesPath = userRole === "lawyer" ? "/lawyer/cases" : "/client/cases";
+      navigate(`${casesPath}?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-card px-6 shadow-sm">
       <SidebarTrigger />
       
       <div className="flex-1 flex items-center gap-4">
-        <div className="relative max-w-md flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <form onSubmit={handleSearch} className="relative max-w-md flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <Input
             type="search"
             placeholder="Search cases, clients, documents..."
             className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch(e);
+              }
+            }}
           />
-        </div>
+        </form>
       </div>
 
       <div className="flex items-center gap-4">
