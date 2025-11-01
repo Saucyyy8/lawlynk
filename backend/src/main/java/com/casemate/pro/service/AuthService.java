@@ -56,8 +56,10 @@ public class AuthService {
                 savedUser.getEmail(),
                 savedUser.getName(),
                 savedUser.getRole().name().toLowerCase(),
-                savedUser.getAge(), // Added age
-                savedUser.getAboutClient() // Added aboutClient
+                savedUser.getPhone(),
+                savedUser.getAddress(),
+                savedUser.getAge(),
+                savedUser.getAboutClient()
             )
         );
     }
@@ -79,8 +81,10 @@ public class AuthService {
                 user.getEmail(),
                 user.getName(),
                 user.getRole().name().toLowerCase(),
-                user.getAge(), // Added age
-                user.getAboutClient() // Added aboutClient
+                user.getPhone(),
+                user.getAddress(),
+                user.getAge(),
+                user.getAboutClient()
             )
         );
     }

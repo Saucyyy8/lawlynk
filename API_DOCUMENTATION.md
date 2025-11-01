@@ -560,3 +560,103 @@ All endpoints should return appropriate error responses:
 9. Configure CORS to allow frontend access
 
 10. Deploy backend to cloud service (Heroku, AWS, Azure, etc.)
+
+---
+
+## User Profile Management Endpoints
+
+### Update User Profile
+**PUT** `/api/users/{userId}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone": "+1 (555) 123-4567",
+  "address": "123 Main St, City, State, ZIP",
+  "age": 35,
+  "aboutClient": "Professional bio or client information"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "uuid-string",
+  "email": "john.doe@example.com",
+  "name": "John Doe",
+  "role": "lawyer",
+  "phone": "+1 (555) 123-4567",
+  "address": "123 Main St, City, State, ZIP",
+  "age": 35,
+  "aboutClient": "Professional bio or client information"
+}
+```
+
+**Error Responses:**
+- **400 Bad Request:** Invalid data or email already taken
+- **401 Unauthorized:** Invalid or missing token
+- **403 Forbidden:** Attempting to update another user's profile
+
+### Change Password
+**PUT** `/api/users/{userId}/password`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "currentPassword": "oldPassword123",
+  "newPassword": "newPassword456"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Password changed successfully"
+}
+```
+
+**Error Responses:**
+- **400 Bad Request:** Current password incorrect or new password too weak
+- **401 Unauthorized:** Invalid or missing token
+- **403 Forbidden:** Attempting to change another user's password
+
+### Get User Profile
+**GET** `/api/users/{userId}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "uuid-string",
+  "email": "john.doe@example.com",
+  "name": "John Doe",
+  "role": "lawyer",
+  "phone": "+1 (555) 123-4567",
+  "address": "123 Main St, City, State, ZIP",
+  "age": 35,
+  "aboutClient": "Professional bio or client information"
+}
+```
+
+**Error Responses:**
+- **401 Unauthorized:** Invalid or missing token
+- **403 Forbidden:** Attempting to view another user's profile
+- **404 Not Found:** User not found
