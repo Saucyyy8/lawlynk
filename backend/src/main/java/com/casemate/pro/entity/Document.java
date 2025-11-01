@@ -55,6 +55,11 @@ public class Document {
     private User uploadedBy;
 
     public enum DocumentCategory {
+        CONTRACT,
+        LEASE_AGREEMENT,
+        EMPLOYMENT_AGREEMENT,
+        COURT_FILING,
+        EVIDENCE,
         PAN_CARD,
         AADHAR_CARD,
         DRIVING_LICENSE,

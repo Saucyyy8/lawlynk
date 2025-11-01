@@ -16,9 +16,18 @@ public class CaseResponse {
     private String title;
     private String description;
     private String status;
-    private String clientName;
-    private String lawyerName;
+    private UserInfo client;
+    private UserInfo lawyer;
+    private Double caseValue;
     private LocalDateTime nextHearing;
     private LocalDateTime updatedAt;
     private LocalDateTime createdAt;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserInfo {
+        private String id;
+        private String name;
+    }
 }

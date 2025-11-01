@@ -139,7 +139,7 @@ export const CaseDetail = ({ caseData, onCaseUpdate }: CaseDetailProps) => {
     }
   };
 
-  const handleCaseAction = async (action: 'accept' | 'reject') => {
+  const handleCaseAction = async (action: 'accept' | 'reject' | 'close') => {
     try {
       const response = await fetch(`${api.baseURL}/api/cases/${caseData.id}/${action}`, {
         method: "PUT",
@@ -184,39 +184,60 @@ export const CaseDetail = ({ caseData, onCaseUpdate }: CaseDetailProps) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h3 className="font-semibold">Assigned Lawyer</h3>
-              <Select onValueChange={handleLawyerChange} value={selectedLawyer || ""}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Choose a lawyer..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {lawyers.map((lawyer) => (
-                    <SelectItem key={lawyer.id} value={lawyer.id}>
-                      {lawyer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {caseData.status === 'PENDING' ? (
+                <Select onValueChange={handleLawyerChange} value={selectedLawyer || ""}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Choose a lawyer..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {lawyers.map((lawyer) => (
+                      <SelectItem key={lawyer.id} value={lawyer.id}>
+                        {lawyer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-muted-foreground">{caseData.lawyer?.name || "Not Assigned"}</p>
+              )}
             </div>
             <div>
               <h3 className="font-semibold">Client</h3>
               <p className="text-muted-foreground">{caseData.client?.name || "Not Assigned"}</p>
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold">Next Hearing</h3>
-            <p className="text-muted-foreground">
-              {caseData.nextHearing ? new Date(caseData.nextHearing).toLocaleString() : "Not set"}
-            </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-semibold">Case Value</h3>
+              <p className="text-muted-foreground">
+                {caseData.caseValue ? `$${caseData.caseValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "Not specified"}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold">Next Hearing</h3>
+              <p className="text-muted-foreground">
+                {caseData.nextHearing ? new Date(caseData.nextHearing).toLocaleString() : "Not set"}
+              </p>
+            </div>
           </div>
 
           {/* Accept/Reject Buttons for PENDING cases */}
           {caseData.status === 'PENDING' && (
             <div className="flex gap-2 mt-4">
-              <Button onClick={() => handleCaseAction('accept')} variant="success">
+              <Button onClick={() => handleCaseAction('accept')} variant="default">
                 Accept Case
               </Button>
               <Button onClick={() => handleCaseAction('reject')} variant="destructive">
                 Reject Case
+              </Button>
+            </div>
+          )}
+
+          {/* Close Case Button for ACTIVE cases */}
+          {caseData.status === 'ACTIVE' && (
+            <div className="flex gap-2 mt-4">
+              <Button onClick={() => handleCaseAction('close')} variant="outline">
+                Close Case
               </Button>
             </div>
           )}

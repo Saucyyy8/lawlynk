@@ -1,5 +1,6 @@
 package com.casemate.pro.controller;
 
+import com.casemate.pro.dto.CaseResponse;
 import com.casemate.pro.entity.Case;
 import com.casemate.pro.entity.User;
 import com.casemate.pro.service.AuthService;
@@ -59,7 +60,8 @@ public class CaseController {
         try {
             User currentUser = authService.getCurrentUser();
             Case caseEntity = caseService.getCaseById(id, currentUser);
-            return ResponseEntity.ok(caseEntity);
+            CaseResponse response = convertToCaseResponse(caseEntity);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.err.println("Error fetching case by ID: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -75,6 +77,9 @@ public class CaseController {
             String title = (String) caseRequest.get("title");
             String description = (String) caseRequest.get("description");
             String nextHearing = (String) caseRequest.get("nextHearing");
+            Object caseValueObj = caseRequest.get("caseValue");
+
+            System.out.println("DEBUG: Creating case with caseValue: " + caseValueObj);
 
             // Extract lawyer information
             Map<String, Object> lawyerMap = (Map<String, Object>) caseRequest.get("lawyer");
@@ -85,6 +90,17 @@ public class CaseController {
             caseData.setDescription(description);
             if (nextHearing != null && !nextHearing.isEmpty()) {
                 caseData.setNextHearing(java.time.LocalDateTime.parse(nextHearing));
+            }
+            if (caseValueObj != null) {
+                try {
+                    Double caseValue = ((Number) caseValueObj).doubleValue();
+                    caseData.setCaseValue(caseValue);
+                    System.out.println("DEBUG: Set caseValue to: " + caseValue);
+                } catch (Exception e) {
+                    System.err.println("Error parsing caseValue: " + e.getMessage());
+                }
+            } else {
+                System.out.println("DEBUG: caseValue is null");
             }
 
             User lawyer = new User();
@@ -163,6 +179,22 @@ public class CaseController {
         }
     }
 
+    @PutMapping("/{id}/close")
+    @PreAuthorize("hasRole('LAWYER')")
+    public ResponseEntity<Object> closeCase(@PathVariable UUID id) {
+        try {
+            User currentUser = authService.getCurrentUser();
+            Case updatedCase = caseService.updateCaseStatus(id, Case.Status.CLOSED, currentUser);
+            return ResponseEntity.ok(updatedCase);
+        } catch (RuntimeException e) {
+            System.err.println("Runtime error closing case: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            System.err.println("Unexpected error closing case: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "An unexpected error occurred while closing the case."));
+        }
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('LAWYER')")
     public ResponseEntity<Object> deleteCase(@PathVariable UUID id) {
@@ -193,5 +225,36 @@ public class CaseController {
             System.err.println("Error fetching recent cases: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
+    }
+
+    private CaseResponse convertToCaseResponse(Case caseEntity) {
+        CaseResponse response = new CaseResponse();
+        response.setId(caseEntity.getId());
+        response.setCaseNumber(caseEntity.getCaseNumber());
+        response.setTitle(caseEntity.getTitle());
+        response.setDescription(caseEntity.getDescription());
+        response.setStatus(caseEntity.getStatus().name());
+        
+        // Set client info
+        if (caseEntity.getClient() != null) {
+            CaseResponse.UserInfo clientInfo = new CaseResponse.UserInfo();
+            clientInfo.setId(caseEntity.getClient().getId().toString());
+            clientInfo.setName(caseEntity.getClient().getName());
+            response.setClient(clientInfo);
+        }
+        
+        // Set lawyer info
+        if (caseEntity.getLawyer() != null) {
+            CaseResponse.UserInfo lawyerInfo = new CaseResponse.UserInfo();
+            lawyerInfo.setId(caseEntity.getLawyer().getId().toString());
+            lawyerInfo.setName(caseEntity.getLawyer().getName());
+            response.setLawyer(lawyerInfo);
+        }
+        
+        response.setCaseValue(caseEntity.getCaseValue());
+        response.setNextHearing(caseEntity.getNextHearing());
+        response.setUpdatedAt(caseEntity.getUpdatedAt());
+        response.setCreatedAt(caseEntity.getCreatedAt());
+        return response;
     }
 }

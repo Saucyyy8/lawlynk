@@ -32,8 +32,9 @@ const LawyerClients = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        setClients(data);
-        setFilteredClients(data);
+        const clientsList = data.clients || data;
+        setClients(clientsList);
+        setFilteredClients(clientsList);
       } else {
         toast({ 
           title: "Error", 

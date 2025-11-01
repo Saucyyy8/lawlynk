@@ -86,6 +86,10 @@ public class CaseService {
         if (caseData.getNextHearing() != null) {
             newCase.setNextHearing(caseData.getNextHearing());
         }
+        
+        if (caseData.getCaseValue() != null) {
+            newCase.setCaseValue(caseData.getCaseValue());
+        }
 
         return caseRepository.save(newCase);
     }

@@ -88,8 +88,24 @@ public class DashboardService {
         response.setTitle(caseEntity.getTitle());
         response.setDescription(caseEntity.getDescription());
         response.setStatus(caseEntity.getStatus().name());
-        response.setClientName(caseEntity.getClient() != null ? caseEntity.getClient().getName() : "Unknown Client");
-        response.setLawyerName(caseEntity.getLawyer() != null ? caseEntity.getLawyer().getName() : "Pending Assignment");
+        
+        // Set client info
+        if (caseEntity.getClient() != null) {
+            CaseResponse.UserInfo clientInfo = new CaseResponse.UserInfo();
+            clientInfo.setId(caseEntity.getClient().getId().toString());
+            clientInfo.setName(caseEntity.getClient().getName());
+            response.setClient(clientInfo);
+        }
+        
+        // Set lawyer info
+        if (caseEntity.getLawyer() != null) {
+            CaseResponse.UserInfo lawyerInfo = new CaseResponse.UserInfo();
+            lawyerInfo.setId(caseEntity.getLawyer().getId().toString());
+            lawyerInfo.setName(caseEntity.getLawyer().getName());
+            response.setLawyer(lawyerInfo);
+        }
+        
+        response.setCaseValue(caseEntity.getCaseValue());
         response.setNextHearing(caseEntity.getNextHearing());
         response.setUpdatedAt(caseEntity.getUpdatedAt());
         response.setCreatedAt(caseEntity.getCreatedAt());
@@ -97,15 +113,18 @@ public class DashboardService {
     }
 
     private Double calculateMonthlyRevenue(User lawyer) {
-        // Placeholder implementation - you can implement based on your business logic
-        // This could involve billing records, case values, etc.
-        return 45230.50;
+        // Calculate total value from all active cases
+        List<Case> allCases = caseRepository.findRecentCasesByLawyer(lawyer, PageRequest.of(0, 1000));
+        
+        return allCases.stream()
+            .filter(c -> c.getStatus() == Case.Status.ACTIVE && c.getCaseValue() != null)
+            .mapToDouble(Case::getCaseValue)
+            .sum();
     }
 
     private Long calculatePendingTasks(User lawyer) {
-        // Placeholder implementation - you can implement based on your business logic
-        // This could involve upcoming hearings, document reviews, etc.
-        return 8L;
+        // Count PENDING cases for the lawyer
+        return caseRepository.countPendingCasesByLawyer(lawyer);
     }
 
     private Long countUpcomingAppointments(User client) {

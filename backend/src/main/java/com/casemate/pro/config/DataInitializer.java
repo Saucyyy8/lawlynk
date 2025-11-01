@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -114,7 +113,8 @@ public class DataInitializer {
                 Document doc1 = new Document();
                 doc1.setName("Contract Agreement - Signed.pdf");
                 doc1.setFilePath("/documents/contract-signed.pdf");
-                doc1.setFileSize(245678L);
+                doc1.setType("application/pdf");
+                doc1.setSize(245678L);
                 doc1.setCategory(Document.DocumentCategory.CONTRACT);
                 doc1.setCaseEntity(case1);
                 doc1.setUploadedBy(client);
@@ -123,7 +123,8 @@ public class DataInitializer {
                 Document doc2 = new Document();
                 doc2.setName("Property Lease Draft.pdf");
                 doc2.setFilePath("/documents/lease-draft.pdf");
-                doc2.setFileSize(156432L);
+                doc2.setType("application/pdf");
+                doc2.setSize(156432L);
                 doc2.setCategory(Document.DocumentCategory.LEASE_AGREEMENT);
                 doc2.setCaseEntity(case2);
                 doc2.setUploadedBy(lawyer);
@@ -132,7 +133,8 @@ public class DataInitializer {
                 Document doc3 = new Document();
                 doc3.setName("Employment Contract.pdf");
                 doc3.setFilePath("/documents/employment-contract.pdf");
-                doc3.setFileSize(198765L);
+                doc3.setType("application/pdf");
+                doc3.setSize(198765L);
                 doc3.setCategory(Document.DocumentCategory.EMPLOYMENT_AGREEMENT);
                 doc3.setCaseEntity(case3);
                 doc3.setUploadedBy(client);
@@ -141,7 +143,8 @@ public class DataInitializer {
                 Document doc4 = new Document();
                 doc4.setName("Partnership Dissolution Notice.pdf");
                 doc4.setFilePath("/documents/partnership-dissolution.pdf");
-                doc4.setFileSize(123456L);
+                doc4.setType("application/pdf");
+                doc4.setSize(123456L);
                 doc4.setCategory(Document.DocumentCategory.COURT_FILING);
                 doc4.setCaseEntity(case4);
                 doc4.setUploadedBy(lawyer);
@@ -150,7 +153,8 @@ public class DataInitializer {
                 Document doc5 = new Document();
                 doc5.setName("Case Evidence - Email Correspondence.pdf");
                 doc5.setFilePath("/documents/evidence-emails.pdf");
-                doc5.setFileSize(345678L);
+                doc5.setType("application/pdf");
+                doc5.setSize(345678L);
                 doc5.setCategory(Document.DocumentCategory.EVIDENCE);
                 doc5.setCaseEntity(case1);
                 doc5.setUploadedBy(client);

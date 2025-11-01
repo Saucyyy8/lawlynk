@@ -42,6 +42,9 @@ public class Case {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column
+    private Double caseValue;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

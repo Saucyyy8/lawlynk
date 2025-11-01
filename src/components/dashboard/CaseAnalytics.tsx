@@ -11,22 +11,28 @@ interface CaseAnalyticsProps {
 }
 
 export function CaseAnalytics({ type, activeCases = 0, pendingCases = 0, closedCases = 0 }: CaseAnalyticsProps) {
-  // Use real data or defaults
+  // Use real data from props
   const caseStatusData = [
-    { name: "Active", value: activeCases || 24, color: "#10b981" },
-    { name: "Pending", value: pendingCases || 8, color: "#f59e0b" },
-    { name: "Closed", value: closedCases || 12, color: "#6b7280" },
+    { name: "Active", value: activeCases, color: "#10b981" },
+    { name: "Pending", value: pendingCases, color: "#f59e0b" },
+    { name: "Closed", value: closedCases, color: "#6b7280" },
   ].filter(item => item.value > 0);
 
-  // Generate realistic monthly data based on current active cases
+  // For now, show total cases distributed across months
+  // In a real app, you'd fetch actual monthly data from the backend
   const generateMonthlyData = () => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-    const total = activeCases || 24;
-    const baseValue = Math.floor(total / 2);
+    const total = activeCases + pendingCases + closedCases;
     
+    if (total === 0) {
+      return months.map(month => ({ month, cases: 0 }));
+    }
+    
+    // Distribute cases somewhat evenly across months for visualization
+    const avgPerMonth = Math.ceil(total / 6);
     return months.map((month, index) => ({
       month,
-      cases: Math.floor(baseValue + Math.random() * baseValue),
+      cases: index === 5 ? total : Math.min(avgPerMonth, total - (index * avgPerMonth)),
     }));
   };
 
@@ -34,7 +40,7 @@ export function CaseAnalytics({ type, activeCases = 0, pendingCases = 0, closedC
 
   useEffect(() => {
     setMonthlyData(generateMonthlyData());
-  }, [activeCases]);
+  }, [activeCases, pendingCases, closedCases]);
 
   const totalCases = caseStatusData.reduce((sum, item) => sum + item.value, 0);
 

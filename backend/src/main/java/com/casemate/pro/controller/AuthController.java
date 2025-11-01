@@ -14,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -53,8 +52,10 @@ public class AuthController {
                 user.getEmail(),
                 user.getName(),
                 user.getRole().name().toLowerCase(),
-                user.getAge(), // Added age
-                user.getAboutClient() // Added aboutClient
+                user.getPhone(),
+                user.getAddress(),
+                user.getAge(),
+                user.getAboutClient()
             );
             return ResponseEntity.ok(userResponse);
         } catch (Exception e) {
@@ -74,6 +75,8 @@ public class AuthController {
                 updatedUser.getEmail(),
                 updatedUser.getName(),
                 updatedUser.getRole().name().toLowerCase(),
+                updatedUser.getPhone(),
+                updatedUser.getAddress(),
                 updatedUser.getAge(),
                 updatedUser.getAboutClient()
             );

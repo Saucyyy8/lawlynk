@@ -52,6 +52,7 @@ const CreateCase = () => {
     const title = formData.get("case-title") as string;
     const description = formData.get("case-description") as string;
     const nextHearing = formData.get("next-hearing") as string;
+    const caseValue = formData.get("case-value") as string;
 
     if (!selectedLawyer) {
       toast({ title: "Error", description: "Please select a lawyer.", variant: "destructive" });
@@ -66,7 +67,13 @@ const CreateCase = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ title, description, nextHearing, lawyer: { id: selectedLawyer } }),
+        body: JSON.stringify({ 
+          title, 
+          description, 
+          nextHearing, 
+          caseValue: caseValue ? parseFloat(caseValue) : null,
+          lawyer: { id: selectedLawyer } 
+        }),
       });
 
       if (!caseResponse.ok) {
@@ -105,6 +112,17 @@ const CreateCase = () => {
               <div className="space-y-2">
                 <Label htmlFor="next-hearing">Next Hearing Date (Optional)</Label>
                 <Input id="next-hearing" name="next-hearing" type="datetime-local" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="case-value">Case Value (Optional)</Label>
+                <Input 
+                  id="case-value" 
+                  name="case-value" 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  placeholder="e.g., 5000.00" 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lawyer-select">Select a Lawyer</Label>
