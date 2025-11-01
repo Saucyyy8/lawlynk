@@ -37,7 +37,7 @@ const ClientCaseDetailPage = () => {
 
   return (
     <DashboardLayout userRole="client">
-      {caseData ? <CaseDetail caseData={caseData} /> : <p>Loading...</p>}
+      {caseData ? <CaseDetail caseData={caseData} userRole="client" /> : <p>Loading...</p>}
     </DashboardLayout>
   );
 };

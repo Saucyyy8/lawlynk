@@ -41,7 +41,7 @@ const LawyerCaseDetailPage = () => {
 
   return (
     <DashboardLayout userRole="lawyer">
-      {caseData ? <CaseDetail caseData={caseData} onCaseUpdate={handleCaseUpdate} /> : <p>Loading...</p>}
+      {caseData ? <CaseDetail caseData={caseData} userRole="lawyer" onCaseUpdate={handleCaseUpdate} /> : <p>Loading...</p>}
     </DashboardLayout>
   );
 };

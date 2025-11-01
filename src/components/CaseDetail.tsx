@@ -23,6 +23,7 @@ interface Lawyer {
 
 interface CaseDetailProps {
   caseData: Case;
+  userRole?: 'lawyer' | 'client';
   onCaseUpdate?: (updatedCase: Case) => void; // Callback for when the case is updated
 }
 
@@ -32,7 +33,7 @@ const statusColors = {
   CLOSED: "bg-muted text-muted-foreground",
 };
 
-export const CaseDetail = ({ caseData, onCaseUpdate }: CaseDetailProps) => {
+export const CaseDetail = ({ caseData, userRole = 'client', onCaseUpdate }: CaseDetailProps) => {
   const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [lawyers, setLawyers] = useState<Lawyer[]>([]);
@@ -221,8 +222,8 @@ export const CaseDetail = ({ caseData, onCaseUpdate }: CaseDetailProps) => {
             </div>
           </div>
 
-          {/* Accept/Reject Buttons for PENDING cases */}
-          {caseData.status === 'PENDING' && (
+          {/* Accept/Reject Buttons for PENDING cases - Lawyers only */}
+          {userRole === 'lawyer' && caseData.status === 'PENDING' && (
             <div className="flex gap-2 mt-4">
               <Button onClick={() => handleCaseAction('accept')} variant="default">
                 Accept Case
@@ -233,8 +234,8 @@ export const CaseDetail = ({ caseData, onCaseUpdate }: CaseDetailProps) => {
             </div>
           )}
 
-          {/* Close Case Button for ACTIVE cases */}
-          {caseData.status === 'ACTIVE' && (
+          {/* Close Case Button for ACTIVE cases - Lawyers only */}
+          {userRole === 'lawyer' && caseData.status === 'ACTIVE' && (
             <div className="flex gap-2 mt-4">
               <Button onClick={() => handleCaseAction('close')} variant="outline">
                 Close Case
