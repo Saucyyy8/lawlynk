@@ -88,8 +88,8 @@ public class DashboardService {
         response.setTitle(caseEntity.getTitle());
         response.setDescription(caseEntity.getDescription());
         response.setStatus(caseEntity.getStatus().name());
-        response.setClientName(caseEntity.getClient().getName());
-        response.setLawyerName(caseEntity.getLawyer().getName());
+        response.setClientName(caseEntity.getClient() != null ? caseEntity.getClient().getName() : "Unknown Client");
+        response.setLawyerName(caseEntity.getLawyer() != null ? caseEntity.getLawyer().getName() : "Pending Assignment");
         response.setNextHearing(caseEntity.getNextHearing());
         response.setUpdatedAt(caseEntity.getUpdatedAt());
         response.setCreatedAt(caseEntity.getCreatedAt());
